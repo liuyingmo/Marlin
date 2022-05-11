@@ -24,7 +24,8 @@
 #define CONFIG_EXAMPLES_DIR "Artillery/Sidewinder X2"
 
 /**
-* Hot bed zone heating switch macro (1:use 0:unuse)
+* Hot bed zone heating switch macro
+*
  */
 #define BED_ZONE_HEAT (1)
 
