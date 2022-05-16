@@ -1,0 +1,272 @@
+#ifndef __ZONE_HEAT_H__
+#define __ZONE_HEAT_H__
+
+#ifdef EXTRN
+	#undef EXTRN
+#endif
+
+#ifdef HERE_EXEC
+	#define	EXTRN
+	#define	INIT_END	1
+#else
+	#define	EXTRN extern
+	#define	INIT_END	0
+#endif
+
+#include "../inc/MarlinConfig.h"
+
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "Arduino.h"
+#include <SoftwareSerial.h>
+
+extern SoftwareSerial sw_uart;
+
+typedef void (*fun_)(uint8_t,int32_t);
+typedef struct
+{
+	fun_     p_fun;
+  uint32_t nLine;
+	int32_t  nStep;
+	uint32_t bTick;
+  bool     lock;
+}type_fun;
+
+#define MAXFUN 15
+EXTRN type_fun SuperFun[MAXFUN];
+
+#define crBegin(_id,_Step) {SuperFun[_id].nStep -=_Step;\
+        if(SuperFun[_id].nStep>0)return; switch(SuperFun[_id].nLine){ case 0:
+
+#define crReturn(_id) do{ SuperFun[_id].nLine=__LINE__;return; case __LINE__:;}while(0)
+#define crWait(_id,nTick) SuperFun[_id].nStep=nTick;crReturn(_id)
+#define crFinish(_id)  SuperFun[_id].nLine=0;}}
+#define crDel(_id) do{SuperFun[_id].nLine=0;SuperFun[_id].nStep=0;SuperFun[_id].p_fun=NULL;}while(0)
+#define crAgain(_id) do { SuperFun[_id].nLine=0; return;}while(0)
+#define crEnd()  }}
+#define crLock(_id) SuperFun[_id].lock=1
+#define crUnlock(_id) SuperFun[_id].lock=0
+
+void task_init(void);
+void task_get(fun_ p_fun_name);
+void task_del(fun_ p_fun_name);
+void task_exec(void);
+void task_get_array(const fun_ arr[],int sum);
+void task_del_array(const fun_ arr[],int sum);
+void task_del_other(fun_ p_fun_name);
+
+//打印板主动
+#define CMD_T100  "T100"//温度询问
+#define CMD_BT100 "BT100"
+
+#define CMD_T101  "T101"//PWM询问
+#define CMD_BT101 "BT101"
+
+#define CMD_T102  "T102"//目标温度
+#define CMD_BT102 "BT102"
+
+#define CMD_T103  "T103"//关闭加热
+#define CMD_BT103 "BT103"
+
+#define CMD_T104  "T104"//请求flash
+#define CMD_BT104 "BT104"
+
+#define CMD_T105  "T105"//write flash
+#define CMD_BT105 "BT105"
+
+#define CMD_T303  "T303"//PID参数整定
+#define CMD_BT303 "BT303"
+
+#define CMD_T304  "T304"//PID 整定状态
+#define CMD_BT304 "BT304"
+
+#define CMD_T107  "T107"//设置PID
+#define CMD_BT107 "BT107"
+//温控板主动
+
+#define CMD_D101  "D101"//温度失常报告
+#define CMD_BD101 "BD101"
+
+#define CMD_D102  "D102"//加热失败
+#define CMD_BD102 "BD102"
+
+#define CMD_D103  "D103"//auto pid info
+
+#define COMM_FRAME  128
+#define MSG_SIZE    20
+#define MSG_USE     1
+#define MSG_UNUSE   0
+
+typedef void (*MSG_CMD_FUNC) (uint8_t *);
+typedef struct
+{
+   char const *cmd;
+   MSG_CMD_FUNC func;
+}msg_cmd_t;
+
+typedef struct 
+{
+  uint8_t buf[COMM_FRAME];
+  int16_t index;
+  uint8_t end_flag;
+}sw_uart_rece_buf_t;
+EXTRN sw_uart_rece_buf_t rece_buf;
+
+typedef struct
+{
+   uint8_t used;
+   uint8_t buf[COMM_FRAME];
+}msg_buf_t;
+EXTRN msg_buf_t msg_buf[MSG_SIZE];
+
+enum
+{
+    bit_request_temp =0,
+    bit_start_heating,
+    bit_turnoff_heat,
+    bit_flash_init,
+    bit_requset_pwm,
+    bit_auto_pid,
+    bit_pid_state,
+    bit_set_pid,
+    bit_setup_finish,
+};
+
+EXTRN uint32_t comm_bit_updata
+#if INIT_END
+=0
+#endif
+;
+#define COMM_BIT_SET(XXX) comm_bit_updata |= MaskBits[XXX]
+#define COMM_BIT_CLS(XXX) comm_bit_updata &= ~MaskBits[XXX]
+#define COMM_BIT_IS0(XXX) (comm_bit_updata & MaskBits[XXX])==0
+#define COMM_BIT_IS1(XXX) (comm_bit_updata & MaskBits[XXX])!=0
+
+#define SYNC_MASK     0x1fff
+EXTRN uint32_t param_bit_updata
+#if INIT_END
+=0
+#endif
+;
+
+typedef struct
+{
+  uint32_t compile_time;
+  double   pid1[3]; 
+  double   pid2[3]; 
+  double   pid3[3]; 
+  double   pid4[3]; 
+  double   pid5[3]; 
+  double   pid6[3]; 
+  double   pid7[3]; 
+  double   pid8[3]; 
+  double   pid9[3]; 
+  uint32_t keepstep,slowstep;
+  uint8_t  used[9];
+  uint32_t min_temp,max_temp; 
+}par_t;
+EXTRN par_t par_config,par_temp;
+
+#define TIME_AS_INT_2 ((((((_YEAR - 2000) * 12 + _MONTH) * 31 + _DAY)*12+_HOUR)*60+_MINUTE)*60+_SECOND)
+EXTRN const par_t const_par
+#if INIT_END
+={
+	.compile_time =TIME_AS_INT,
+	.pid1 ={DEFAULT_bedKp,DEFAULT_bedKi,DEFAULT_bedKd},
+	.pid2 ={DEFAULT_bedKp,DEFAULT_bedKi,DEFAULT_bedKd},
+	.pid3 ={DEFAULT_bedKp,DEFAULT_bedKi,DEFAULT_bedKd},
+	.pid4 ={DEFAULT_bedKp,DEFAULT_bedKi,DEFAULT_bedKd},
+	.pid5 ={DEFAULT_bedKp,DEFAULT_bedKi,DEFAULT_bedKd},
+	.pid6 ={DEFAULT_bedKp,DEFAULT_bedKi,DEFAULT_bedKd},
+	.pid7 ={DEFAULT_bedKp,DEFAULT_bedKi,DEFAULT_bedKd},
+	.pid8 ={DEFAULT_bedKp,DEFAULT_bedKi,DEFAULT_bedKd},
+	.pid9 ={DEFAULT_bedKp,DEFAULT_bedKi,DEFAULT_bedKd},
+	.keepstep =30,//constant temperature
+	.slowstep =80,//slow temperature rise
+	.used ={1,1,0,0,0,0,0,0,0},
+	.min_temp =BED_MINTEMP,
+	.max_temp =BED_MAXTEMP,
+}
+#endif
+;
+
+extern const uint32_t MaskBits[32]
+#if INIT_END
+= {
+	0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80,
+	(0x1UL << 8), (0x1UL << 9), (0x1UL << 10), (0x1UL << 11),
+	(0x1UL << 12), (0x1UL << 13), (0x1UL << 14), (0x1UL << 15),
+	(0x1UL << 16), (0x1UL << 17), (0x1UL << 18), (0x1UL << 19),
+	(0x1UL << 20), (0x1UL << 21), (0x1UL << 22), (0x1UL << 23),
+	(0x1UL << 24), (0x1UL << 25), (0x1UL << 26), (0x1UL << 27),
+	(0x1UL << 28), (0x1UL << 29), (0x1UL << 30), (0x1UL << 31),
+}
+#endif
+;
+
+#define SUM_TEMP_ZONE  (9)
+typedef struct 
+{
+  int32_t zone_temp[SUM_TEMP_ZONE];//温度
+  bool    zooe_state[SUM_TEMP_ZONE];//是否稳定
+  int32_t zone_pwm[SUM_TEMP_ZONE];//当前PWM值
+}comm_data_t;
+
+EXTRN comm_data_t comm_dat
+#if INIT_END
+={0,}
+#endif
+;
+
+enum
+{
+	pid_bit_act =0,
+	pid_bit_succ,
+	pid_bit_overtime,
+};
+
+EXTRN uint32_t pid_bit_updata
+#if INIT_END
+=0
+#endif
+;
+
+typedef struct
+{
+   float  temp;
+   int    h;
+   int    c;
+   bool   u;
+   int    hid;
+}m303_t;
+EXTRN m303_t g_m303;
+
+uint8_t get_heat_pwm(void);
+celsius_float_t get_heat_temp(void);
+void HAL_watchdog_refresh();
+void init_msg_buf(void);
+void sw_uart_recv(sw_uart_rece_buf_t *p_rece_buf,char c);
+void msg_deal(void);
+int spit_string(char *str,const char *c,const char *p[],int cnt);
+void cmd_string(const char*cmd,char const *format,...);
+void printf_string(char const *format,...);
+void printf_nothing(char const *format,...);
+
+void task_start_up(uint8_t id,int32_t ntick);
+void task_request_temp(uint8_t id,int32_t ntick);
+void task_request_pwm(uint8_t id,int32_t ntick);
+void task_pid_autotune(uint8_t id,int32_t ntick);
+
+#define GetItemSum( XX ) (sizeof(XX)/sizeof(XX[0]))
+
+#define __DEBUG 1
+#if __DEBUG
+#define debug_string  printf_string
+#else
+#define debug_string printf_nothing
+#endif
+
+#define debugline() debug_string("%s->%d\n",__FILE__,__LINE__)
+#endif// __ZONE_HEAT_H__
+
