@@ -33,7 +33,7 @@
 #define BOARD_INFO_NAME "MKS Monster8 V1.x"
 
 #define HAS_OTG_USB_HOST_SUPPORT                  // USB Flash Drive support
-#define USES_DIAG_JUMPERS
+//#define USES_DIAG_JUMPERS
 
 //#define DISABLE_DEBUG
 
@@ -206,6 +206,7 @@
 #define FAN_PIN                             PA2   // FAN0
 #define FAN1_PIN                            PA1   // FAN1
 #define FAN2_PIN                            PA0   // FAN2
+#define FAN_SOFT_PWM
 
 //
 // Misc. Functions
