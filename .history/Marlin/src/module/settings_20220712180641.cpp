@@ -2680,21 +2680,11 @@ void MarlinSettings::postprocess() {
     if (validate()) {
       const bool success = _load();
       TERN_(EXTENSIBLE_UI, ExtUI::onSettingsLoaded(success));
-     
-      #ifdef HOME_OFFSET_XY
-        home_offset.x =HOME_OFFSET_X;
-        home_offset.y =HOME_OFFSET_Y;
-      #endif
-
+      home_offset.x =1000;
       return success;
     }
     reset();
-
-      #ifdef HOME_OFFSET_XY
-        home_offset.x =HOME_OFFSET_X;
-        home_offset.y =HOME_OFFSET_Y;
-      #endif
-
+    home_offset.x =1001;
     #if EITHER(EEPROM_AUTO_INIT, EEPROM_INIT_NOW)
       (void)save();
       SERIAL_ECHO_MSG("EEPROM Initialized");

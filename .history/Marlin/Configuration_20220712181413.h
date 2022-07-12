@@ -3102,8 +3102,6 @@
 
 //STM32F4XX
 #define M997_JUMP_DFU
-
-//Fixed and unchangeable home offset
 #define HOME_OFFSET_XY
 #define HOME_OFFSET_X 10
 #define HOME_OFFSET_Y 10
