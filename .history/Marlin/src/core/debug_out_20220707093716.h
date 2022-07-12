@@ -65,7 +65,7 @@
   #define DEBUG_DECIMAL           SERIAL_DECIMAL
   #define DEBUG_ECHO_F            SERIAL_ECHO_F
   #define DEBUG_ECHOLN            SERIAL_ECHOLN
-  //#define DEBUG_ECHOPGM           SERIAL_ECHOPGM
+  #define DEBUG_ECHOPGM           SERIAL_ECHOPGM
   #define DEBUG_ECHOLNPGM         SERIAL_ECHOLNPGM
   #define DEBUG_ECHOF             SERIAL_ECHOF
   #define DEBUG_ECHOLNF           SERIAL_ECHOLNF
@@ -96,7 +96,7 @@
   #define DEBUG_DECIMAL(...)        NOOP
   #define DEBUG_ECHO_F(...)         NOOP
   #define DEBUG_ECHOLN(...)         NOOP
-  #define DEBUG_ECHOPGM(...)        NOOP
+  #define DEBUG_ECHOPGM(...)        printf_string//NOOP
   #define DEBUG_ECHOLNPGM(...)      NOOP
   #define DEBUG_ECHOF(...)          NOOP
   #define DEBUG_ECHOLNF(...)        NOOP

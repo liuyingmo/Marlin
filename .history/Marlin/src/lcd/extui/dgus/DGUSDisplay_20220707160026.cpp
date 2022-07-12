@@ -198,7 +198,7 @@ void DGUSDisplay::ProcessRx() {
           rx_datagram_state = DGUS_IDLE;
           break;
         }
-        //printf_string("cmd %s",tmp);
+        printf_string("cmd %s",tmp);
         /* AutoUpload, (and answer to) Command 0x83 :
         |      tmp[0  1  2  3  4 ... ]
         | Example 5A A5 06 83 20 01 01 78 01 ……

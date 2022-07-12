@@ -79,6 +79,7 @@ void DGUSDisplay::InitDisplay() {
 void DGUSDisplay::WriteVariable(uint16_t adr, const void *values, uint8_t valueslen, bool isstr) {
   const char* myvalues = static_cast<const char*>(values);
   bool strend = !myvalues;
+  debline();
   WriteHeader(adr, DGUS_CMD_WRITEVAR, valueslen);
   while (valueslen--) {
     char x;
@@ -93,19 +94,23 @@ void DGUSDisplay::WriteVariable(uint16_t adr, const void *values, uint8_t values
 
 void DGUSDisplay::WriteVariable(uint16_t adr, uint16_t value) {
   value = (value & 0xFFU) << 8U | (value >> 8U);
+  debline();
   WriteVariable(adr, static_cast<const void*>(&value), sizeof(uint16_t));
 }
 
 void DGUSDisplay::WriteVariable(uint16_t adr, int16_t value) {
   value = (value & 0xFFU) << 8U | (value >> 8U);
+  debline();
   WriteVariable(adr, static_cast<const void*>(&value), sizeof(uint16_t));
 }
 
 void DGUSDisplay::WriteVariable(uint16_t adr, uint8_t value) {
+   debline();
   WriteVariable(adr, static_cast<const void*>(&value), sizeof(uint8_t));
 }
 
 void DGUSDisplay::WriteVariable(uint16_t adr, int8_t value) {
+   debline();
   WriteVariable(adr, static_cast<const void*>(&value), sizeof(int8_t));
 }
 
@@ -117,12 +122,14 @@ void DGUSDisplay::WriteVariable(uint16_t adr, long value) {
   tmp[1] = endian.lb[2];
   tmp[2] = endian.lb[1];
   tmp[3] = endian.lb[0];
+   debline();
   WriteVariable(adr, static_cast<const void*>(&tmp), sizeof(long));
 }
 
 void DGUSDisplay::WriteVariablePGM(uint16_t adr, const void *values, uint8_t valueslen, bool isstr) {
   const char* myvalues = static_cast<const char*>(values);
   bool strend = !myvalues;
+  debline();
   WriteHeader(adr, DGUS_CMD_WRITEVAR, valueslen);
   while (valueslen--) {
     char x;
@@ -155,19 +162,19 @@ void DGUSDisplay::ProcessRx() {
 
       case DGUS_IDLE: // Waiting for the first header byte
         receivedbyte = LCD_SERIAL.read();
-        DEBUGLCDCOMM_ECHOPGM("< ", receivedbyte);
+        //DEBUGLCDCOMM_ECHOPGM("< ", receivedbyte);
         if (DGUS_HEADER1 == receivedbyte) rx_datagram_state = DGUS_HEADER1_SEEN;
         break;
 
       case DGUS_HEADER1_SEEN: // Waiting for the second header byte
         receivedbyte = LCD_SERIAL.read();
-        DEBUGLCDCOMM_ECHOPGM(" ", receivedbyte);
+        //DEBUGLCDCOMM_ECHOPGM(" ", receivedbyte);
         rx_datagram_state = (DGUS_HEADER2 == receivedbyte) ? DGUS_HEADER2_SEEN : DGUS_IDLE;
         break;
 
       case DGUS_HEADER2_SEEN: // Waiting for the length byte
         rx_datagram_len = LCD_SERIAL.read();
-        DEBUGLCDCOMM_ECHOPGM(" (", rx_datagram_len, ") ");
+        //DEBUGLCDCOMM_ECHOPGM(" (", rx_datagram_len, ") ");
 
         // Telegram min len is 3 (command and one word of payload)
         rx_datagram_state = WITHIN(rx_datagram_len, 3, DGUS_RX_BUFFER_SIZE) ? DGUS_WAIT_TELEGRAM : DGUS_IDLE;
@@ -179,14 +186,14 @@ void DGUSDisplay::ProcessRx() {
         Initialized = true; // We've talked to it, so we defined it as initialized.
         uint8_t command = LCD_SERIAL.read();
 
-        DEBUGLCDCOMM_ECHOPGM("# ", command);
+        //DEBUGLCDCOMM_ECHOPGM("# ", command);
 
         uint8_t readlen = rx_datagram_len - 1;  // command is part of len.
         unsigned char tmp[rx_datagram_len - 1];
         unsigned char *ptmp = tmp;
         while (readlen--) {
           receivedbyte = LCD_SERIAL.read();
-          DEBUGLCDCOMM_ECHOPGM(" ", receivedbyte);
+          //DEBUGLCDCOMM_ECHOPGM(" ", receivedbyte);
           *ptmp++ = receivedbyte;
         }
         
@@ -194,11 +201,11 @@ void DGUSDisplay::ProcessRx() {
         //DEBUGLCDCOMM_ECHOPGM(" # ");
         // mostly we'll get this: 5A A5 03 82 4F 4B -- ACK on 0x82, so discard it.
         if (command == DGUS_CMD_WRITEVAR && 'O' == tmp[0] && 'K' == tmp[1]) {
-          DEBUGLCDCOMM_ECHOPGM(">");
+          //DEBUGLCDCOMM_ECHOPGM(">");
           rx_datagram_state = DGUS_IDLE;
           break;
         }
-        //printf_string("cmd %s",tmp);
+        printf_string("cmd %s",tmp);
         /* AutoUpload, (and answer to) Command 0x83 :
         |      tmp[0  1  2  3  4 ... ]
         | Example 5A A5 06 83 20 01 01 78 01 ……

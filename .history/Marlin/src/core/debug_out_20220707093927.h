@@ -65,7 +65,7 @@
   #define DEBUG_DECIMAL           SERIAL_DECIMAL
   #define DEBUG_ECHO_F            SERIAL_ECHO_F
   #define DEBUG_ECHOLN            SERIAL_ECHOLN
-  //#define DEBUG_ECHOPGM           SERIAL_ECHOPGM
+  #define DEBUG_ECHOPGM           SERIAL_ECHOPGM
   #define DEBUG_ECHOLNPGM         SERIAL_ECHOLNPGM
   #define DEBUG_ECHOF             SERIAL_ECHOF
   #define DEBUG_ECHOLNF           SERIAL_ECHOLNF
