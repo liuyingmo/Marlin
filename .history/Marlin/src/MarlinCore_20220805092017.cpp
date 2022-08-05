@@ -1684,7 +1684,7 @@ void loop() {
   } while (ENABLED(__AVR__)); // Loop forever on slower (AVR) boards
 }
 
-void printf_null(char const *format,...)
+void printf_string(char const *format,...)
 {
 }
 

@@ -61,4 +61,4 @@
 void printf_string(char const *format,...);
 void printf_null(char const *format,...);
 #define debline() printf_null("%s->%d",__FUNCTION__,__LINE__)
-//#define debline() printf_string("%s->%d",__FUNCTION__,__LINE__)
+#define debline() printf_string("%s->%d",__FUNCTION__,__LINE__)
