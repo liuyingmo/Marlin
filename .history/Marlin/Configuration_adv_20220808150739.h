@@ -924,7 +924,7 @@
 #define Z_STEPPER_AUTO_ALIGN
 #define OFFSET_X -5
 #define OFFSET_Y 35
-#define OFFSET_Z -1.84
+#define OFFSET_Z -1.74
 
 #if ENABLED(Z_STEPPER_AUTO_ALIGN)
   // Define probe X and Y positions for Z1, Z2 [, Z3 [, Z4]]
