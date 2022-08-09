@@ -316,6 +316,10 @@ PGMSTR(str_t_heating_failed, STR_T_HEATING_FAILED);
   uint8_t Temperature::chamberfan_speed; // = 0
 #endif
 
+#if ENABLED(CHAMBER_AUTO_FAN_MANUAL)
+  uint8_t Temperature::chamberfan_speed; // = 0
+#endif
+
 #if ENABLED(AUTO_POWER_COOLER_FAN)
   uint8_t Temperature::coolerfan_speed; // = 0
 #endif
@@ -1172,7 +1176,7 @@ int16_t Temperature::getHeaterPower(const heater_id_t heater_id) {
       if (TEST(fanDone, realFan)) continue;
       const bool fan_on = TEST(fanState, realFan);
       switch (f) {
-        #if EITHER(AUTO_POWER_CHAMBER_FAN,CHAMBER_AUTO_FAN_MANUAL)
+        #if ENABLED(AUTO_POWER_CHAMBER_FAN)
           case CHAMBER_FAN_INDEX:
             chamberfan_speed = fan_on ? CHAMBER_AUTO_FAN_SPEED : 0;
             break;
@@ -1216,7 +1220,7 @@ int16_t Temperature::getHeaterPower(const heater_id_t heater_id) {
         #if HAS_AUTO_FAN_7
           _AUTOFAN_CASE(7);
         #endif
-        #if ((HAS_AUTO_CHAMBER_FAN && !AUTO_CHAMBER_IS_E)||defined(CHAMBER_AUTO_FAN_MANUAL))
+        #if HAS_AUTO_CHAMBER_FAN && !AUTO_CHAMBER_IS_E
           case CHAMBER_FAN_INDEX: _UPDATE_AUTO_FAN(CHAMBER, fan_on, CHAMBER_AUTO_FAN_SPEED); break;
         #endif
       }

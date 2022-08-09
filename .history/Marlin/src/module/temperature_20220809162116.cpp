@@ -1219,6 +1219,9 @@ int16_t Temperature::getHeaterPower(const heater_id_t heater_id) {
         #if ((HAS_AUTO_CHAMBER_FAN && !AUTO_CHAMBER_IS_E)||defined(CHAMBER_AUTO_FAN_MANUAL))
           case CHAMBER_FAN_INDEX: _UPDATE_AUTO_FAN(CHAMBER, fan_on, CHAMBER_AUTO_FAN_SPEED); break;
         #endif
+        #ifdef CHAMBER_AUTO_FAN_MANUAL
+          case CHAMBER_FAN_INDEX: _UPDATE_AUTO_FAN(CHAMBER, fan_on, CHAMBER_AUTO_FAN_SPEED); break;
+        #endif
       }
       SBI(fanDone, realFan);
     }

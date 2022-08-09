@@ -415,7 +415,7 @@ class Temperature {
     #if EITHER(AUTO_POWER_E_FANS, HAS_FANCHECK)
       static uint8_t autofan_speed[HOTENDS];
     #endif
-    #if EITHER(AUTO_POWER_CHAMBER_FAN,CHAMBER_AUTO_FAN_MANUAL)
+    #if ENABLED(AUTO_POWER_CHAMBER_FAN)
       static uint8_t chamberfan_speed;
     #endif
     #if ENABLED(AUTO_POWER_COOLER_FAN)

@@ -2705,7 +2705,7 @@
 #if HAS_TEMP(BED)
   #define HAS_TEMP_BED 1
 #endif
-#if HAS_TEMP(CHAMBER)
+#if (HAS_TEMP(CHAMBER) || defined(CHAMBER_TEMP_MANUAL))
   #define HAS_TEMP_CHAMBER 1
 #endif
 #if HAS_TEMP(PROBE)

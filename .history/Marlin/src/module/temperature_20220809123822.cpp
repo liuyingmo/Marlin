@@ -312,7 +312,7 @@ PGMSTR(str_t_heating_failed, STR_T_HEATING_FAILED);
   uint8_t Temperature::autofan_speed[HOTENDS]; // = { 0 }
 #endif
 
-#if EITHER(AUTO_POWER_CHAMBER_FAN,CHAMBER_AUTO_FAN_MANUAL)
+#if ENABLED(AUTO_POWER_CHAMBER_FAN)
   uint8_t Temperature::chamberfan_speed; // = 0
 #endif
 
@@ -1131,7 +1131,7 @@ int16_t Temperature::getHeaterPower(const heater_id_t heater_id) {
         #define _NEXT_FAN(N) , REPEAT2(N,_EFAN,N) N
         RREPEAT_S(1, HOTENDS, _NEXT_FAN)
       #endif
-      #if HAS_AUTO_CHAMBER_FAN||1
+      #if HAS_AUTO_CHAMBER_FAN
         #define _CFAN(B) _FANOVERLAP(CHAMBER,B) ? B :
         , REPEAT(HOTENDS,_CFAN) (HOTENDS)
       #endif
@@ -1147,11 +1147,6 @@ int16_t Temperature::getHeaterPower(const heater_id_t heater_id) {
     #if HAS_AUTO_CHAMBER_FAN
       if (temp_chamber.celsius >= CHAMBER_AUTO_FAN_TEMPERATURE)
         SBI(fanState, pgm_read_byte(&fanBit[CHAMBER_FAN_INDEX]));
-    #endif
-
-    #ifdef CHAMBER_AUTO_FAN_MANUAL
-      if (temp_hotend[0].celsius >= CHAMBER_AUTO_FAN_TEMPERATURE)
-        SBI(fanState, pgm_read_byte(&fanBit[CHAMBER_FAN_INDEX]));       
     #endif
 
     #if HAS_AUTO_COOLER_FAN
@@ -1172,7 +1167,7 @@ int16_t Temperature::getHeaterPower(const heater_id_t heater_id) {
       if (TEST(fanDone, realFan)) continue;
       const bool fan_on = TEST(fanState, realFan);
       switch (f) {
-        #if EITHER(AUTO_POWER_CHAMBER_FAN,CHAMBER_AUTO_FAN_MANUAL)
+        #if ENABLED(AUTO_POWER_CHAMBER_FAN)
           case CHAMBER_FAN_INDEX:
             chamberfan_speed = fan_on ? CHAMBER_AUTO_FAN_SPEED : 0;
             break;
@@ -1216,7 +1211,7 @@ int16_t Temperature::getHeaterPower(const heater_id_t heater_id) {
         #if HAS_AUTO_FAN_7
           _AUTOFAN_CASE(7);
         #endif
-        #if ((HAS_AUTO_CHAMBER_FAN && !AUTO_CHAMBER_IS_E)||defined(CHAMBER_AUTO_FAN_MANUAL))
+        #if HAS_AUTO_CHAMBER_FAN && !AUTO_CHAMBER_IS_E
           case CHAMBER_FAN_INDEX: _UPDATE_AUTO_FAN(CHAMBER, fan_on, CHAMBER_AUTO_FAN_SPEED); break;
         #endif
       }

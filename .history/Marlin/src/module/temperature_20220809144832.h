@@ -418,6 +418,11 @@ class Temperature {
     #if EITHER(AUTO_POWER_CHAMBER_FAN,CHAMBER_AUTO_FAN_MANUAL)
       static uint8_t chamberfan_speed;
     #endif
+
+    #if ENABLED(CHAMBER_AUTO_FAN_MANUAL)
+      static uint8_t chamberfan_speed;
+    #endif
+
     #if ENABLED(AUTO_POWER_COOLER_FAN)
       static uint8_t coolerfan_speed;
     #endif

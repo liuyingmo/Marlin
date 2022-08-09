@@ -2926,7 +2926,6 @@
 
 #define _NOT_E_AUTO(N,F) (E##N##_AUTO_FAN_PIN != FAN##F##_PIN)
 #define _HAS_FAN(F) (PIN_EXISTS(FAN##F) \
-                     && CHAMBER_AUTO_FAN_PIN !=FAN##F##_PIN \
                      && CONTROLLER_FAN_PIN != FAN##F##_PIN \
                      && _NOT_E_AUTO(0,F) \
                      && _NOT_E_AUTO(1,F) \
@@ -2936,7 +2935,8 @@
                      && _NOT_E_AUTO(5,F) \
                      && _NOT_E_AUTO(6,F) \
                      && _NOT_E_AUTO(7,F) \
-                     && F < MAX_FANS)
+                     && F < MAX_FANS\
+                     && CONTROLLER_FAN_PIN != FAN##F##_PIN)
 #if PIN_EXISTS(FAN)
   #define HAS_FAN0 1
 #endif

@@ -614,7 +614,7 @@
 #define COOLER_AUTO_FAN_TEMPERATURE 18
 #define COOLER_AUTO_FAN_SPEED 255
 
-#define CHAMBER_AUTO_FAN_MANUAL   //Custom cavity sensor
+#define CHAMBER_TEMP_IS 1
 /**
  * Hotend Cooling Fans tachometers
  *
